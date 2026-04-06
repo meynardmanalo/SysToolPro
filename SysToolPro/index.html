@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>SysToolPro ☠️</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:       #0b0715;
+  --bg2:      #110d1f;
+  --glass:    rgba(255,255,255,0.04);
+  --glassh:   rgba(255,255,255,0.08);
+  --border:   rgba(180,120,255,0.18);
+  --borderh:  rgba(200,140,255,0.38);
+  --text:     #f0e8ff;
+  --muted:    #9b86c8;
+  --muted2:   #6b5a9a;
+  --purple:   #a855f7;
+  --purple2:  #7c3aed;
+  --pink:     #f472b6;
+  --pink2:    #ec4899;
+  --lavender: #c4b5fd;
+  --green:    #86efac;
+  --red:      #fca5a5;
+  --yellow:   #fde68a;
+  --glow:     0 0 20px rgba(168,85,247,0.35),0 0 60px rgba(168,85,247,0.1);
+  --glow-pink:0 0 20px rgba(244,114,182,0.35),0 0 60px rgba(244,114,182,0.1);
+  --radius:   20px;
+  --radius-sm:13px;
+}
+
+html{ font-size: 17px; }
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:'Nunito',sans-serif;color:var(--text);display:flex;flex-direction:column}
+
+/* BG MESH */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 10%,rgba(124,58,237,0.2) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 90%,rgba(244,114,182,0.15) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 60% at 70% 20%,rgba(168,85,247,0.1) 0%,transparent 60%),
+    var(--bg);
+  pointer-events:none;
+}
+
+/* ====== TOPBAR with Banner ====== */
+#topbar{
+  position:relative;z-index:10;
+  flex-shrink:0;
+  height:130px;
+  overflow:hidden;
+  border-bottom:2px solid var(--border);
+}
+/* Banner — fully stretched 2500x500 → fills div */
+#topbar-banner{
+  position:absolute;inset:0;
+  background:url('assets/banner.png') center center / 100% 100% no-repeat;
+  filter:brightness(0.6) saturate(1.3);
+}
+/* Dark overlay for readability */
+#topbar-banner::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(11,7,21,0.78) 0%,rgba(11,7,21,0.35) 50%,rgba(11,7,21,0.6) 100%);
+}
+#topbar-content{
+  position:relative;z-index:2;
+  height:100%;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 26px;
+}
+.logo-area{display:flex;align-items:center;gap:14px}
+
+/* Logo — big, no border-radius clipping the design, no extra padding */
+.logo-img{
+  width:76px;height:76px;
+  border-radius:0;
+  object-fit:contain;
+  filter:drop-shadow(0 0 14px rgba(168,85,247,0.7)) drop-shadow(0 0 30px rgba(244,114,182,0.4));
+  flex-shrink:0;
+}
+.logo-img-fallback{
+  width:76px;height:76px;border-radius:16px;
+  background:linear-gradient(135deg,var(--purple2),var(--pink));
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;box-shadow:var(--glow);flex-shrink:0;
+}
+.logo-text h1{font-size:22px;font-weight:900;letter-spacing:-.3px;color:#fff;text-shadow:0 0 20px rgba(168,85,247,0.6)}
+.logo-text p{font-size:11.5px;color:var(--lavender);font-weight:700;letter-spacing:.6px;text-transform:uppercase;opacity:.85}
+
+/* Status pill */
+.status-pill{
+  display:flex;align-items:center;gap:9px;
+  background:rgba(134,239,172,0.08);
+  border:1px solid rgba(134,239,172,0.25);
+  border-radius:20px;padding:9px 18px;
+  font-size:14px;font-weight:800;color:var(--green);
+  box-shadow:0 0 16px rgba(134,239,172,0.08);
+}
+/* Status icon — no padding, full size, glowing */
+.status-pill img{
+  width:32px;height:32px;
+  object-fit:contain;
+  animation:blink 2s infinite;
+  filter:drop-shadow(0 0 6px rgba(134,239,172,0.6));
+}
+.status-dot-fallback{animation:blink 2s infinite;font-size:14px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ====== MAIN LAYOUT ====== */
+#app{position:relative;z-index:1;flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* ====== SIDEBAR ====== */
+#sidebar{
+  width:255px;flex-shrink:0;
+  background:rgba(17,13,31,0.6);
+  backdrop-filter:blur(20px);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+}
+#sidebar::-webkit-scrollbar{width:3px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.sec-label{
+  font-size:11px;font-weight:800;letter-spacing:1.2px;
+  text-transform:uppercase;color:var(--muted2);
+  padding:18px 18px 6px;
+}
+.nav-btn{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 14px 11px 16px;
+  margin:3px 10px;
+  border-radius:var(--radius-sm);
+  cursor:pointer;
+  font-size:14px;font-weight:700;color:var(--muted);
+  transition:all .18s;border:1px solid transparent;
+  user-select:none;
+}
+.nav-btn:hover{background:var(--glassh);color:var(--text)}
+.nav-btn.active{
+  background:linear-gradient(135deg,rgba(168,85,247,0.22),rgba(244,114,182,0.12));
+  color:var(--lavender);border-color:var(--border);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+}
+/* Nav icon wrapper — transparent, PNG is the design */
+.ni{
+  width:52px;height:52px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  transition:all .2s;overflow:visible;
+  background:none;border:none;border-radius:0;
+}
+.nav-btn.active .ni{ background:none; box-shadow:none; }
+.nav-btn:hover .ni{ background:none; }
+
+/* Nav PNG — IS the icon, fills full size, no clipping */
+.ni img{
+  width:52px;height:52px;
+  object-fit:contain;
+  padding:0;
+  filter:brightness(0.65) saturate(0.7);
+  transition:filter .2s, transform .2s;
+}
+.nav-btn.active .ni img{
+  filter:brightness(1.1) saturate(1.2) drop-shadow(0 0 10px rgba(168,85,247,0.8));
+  transform:scale(1.05);
+}
+.nav-btn:hover .ni img{
+  filter:brightness(0.9) saturate(1);
+  transform:scale(1.05);
+}
+
+.sidebar-footer{
+  margin-top:auto;padding:16px 18px;
+  border-top:1px solid var(--border);
+  font-size:12px;color:var(--muted2);font-weight:600;
+  display:flex;align-items:center;gap:6px;
+}
+
+/* ====== CONTENT AREA ====== */
+#content-wrap{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px;min-width:0}
+#content-wrap::-webkit-scrollbar{width:4px}
+#content-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ====== PAGE HEADER ====== */
+.page-header{margin-bottom:20px}
+.page-title{font-size:26px;font-weight:900;letter-spacing:-.5px;color:var(--text)}
+.page-sub{font-size:13px;color:var(--muted);margin-top:4px;font-weight:600}
+
+/* ====== CARDS ====== */
+.card{
+  background:var(--glass);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px;
+  backdrop-filter:blur(12px);
+  transition:border-color .2s,box-shadow .2s;
+  animation:fadeUp .3s ease both;
+}
+.card:hover{border-color:var(--borderh)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-label{
+  display:flex;align-items:center;gap:9px;
+  font-size:12px;font-weight:800;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--muted);
+}
+/* Card icon — transparent wrapper, PNG is the design */
+.card-icon{
+  width:52px;height:52px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;
+  flex-shrink:0;overflow:visible;
+  background:none;border:none;box-shadow:none;
+}
+/* PNG fills card icon fully, no clipping */
+.card-icon img{
+  width:52px;height:52px;
+  object-fit:contain;
+  padding:0;
+  filter:drop-shadow(0 0 8px rgba(168,85,247,0.5));
+}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+
+/* ====== INFO ROWS ====== */
+.row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid rgba(180,120,255,0.08)}
+.row:first-child{padding-top:0}
+.row:last-child{border-bottom:none;padding-bottom:0}
+.row-key{font-size:14px;color:var(--muted);font-weight:700}
+.row-val{font-size:14px;color:var(--text);font-weight:700;text-align:right;max-width:60%;word-break:break-all}
+
+/* ====== PILLS ====== */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:800}
+.pill-p{background:rgba(168,85,247,0.15);color:var(--lavender);border:1px solid rgba(168,85,247,0.25)}
+.pill-g{background:rgba(134,239,172,0.1);color:var(--green);border:1px solid rgba(134,239,172,0.2)}
+.pill-r{background:rgba(252,165,165,0.1);color:var(--red);border:1px solid rgba(252,165,165,0.2)}
+.pill-y{background:rgba(253,230,138,0.1);color:var(--yellow);border:1px solid rgba(253,230,138,0.2)}
+.pill-pk{background:rgba(244,114,182,0.12);color:var(--pink);border:1px solid rgba(244,114,182,0.22)}
+
+/* ====== TABLE ====== */
+.tbl-wrap{overflow-x:auto;border-radius:var(--radius-sm)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{padding:11px 14px;text-align:left;font-size:11px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:var(--muted2);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid rgba(180,120,255,0.06);vertical-align:middle}
+tr:hover td{background:rgba(168,85,247,0.04)}
+tr:last-child td{border-bottom:none}
+
+/* ====== FORMS ====== */
+.fg{margin-bottom:15px}
+.fg label{display:block;font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--muted);margin-bottom:7px;text-transform:uppercase}
+input,select{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 15px;color:var(--text);font-size:15px;font-family:'Nunito',sans-serif;font-weight:600;outline:none;transition:border .18s,box-shadow .18s}
+input::placeholder{color:var(--muted2)}
+input:focus,select:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(168,85,247,0.12)}
+select option{background:#1a0d2e;color:var(--text)}
+input[type=checkbox]{width:auto;cursor:pointer;accent-color:var(--purple)}
+.check-row{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;margin-bottom:16px}
+
+/* ====== BUTTONS ====== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 22px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;letter-spacing:.2px;transition:all .18s;user-select:none}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn-primary{background:linear-gradient(135deg,var(--purple2),var(--purple));color:#fff;box-shadow:var(--glow)}
+.btn-primary:hover:not(:disabled){box-shadow:0 0 24px rgba(168,85,247,0.5),0 0 60px rgba(168,85,247,0.15)}
+.btn-danger{background:linear-gradient(135deg,#be123c,#e11d48);color:#fff;box-shadow:0 0 16px rgba(225,29,72,0.3)}
+.btn-success{background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;box-shadow:0 0 16px rgba(22,163,74,0.25)}
+.btn-ghost{background:var(--glass);border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{background:var(--glassh);border-color:var(--borderh)}
+.btn-sm{padding:8px 16px;font-size:13px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* ====== WARNING BOX ====== */
+.warn{background:rgba(253,230,138,0.06);border:1px solid rgba(253,230,138,0.25);border-radius:var(--radius-sm);padding:15px 18px;margin-bottom:18px}
+.warn-head{display:flex;align-items:center;gap:14px;margin-bottom:7px}
+.warn-head img{
+  width:58px;height:58px;
+  object-fit:contain;flex-shrink:0;
+  filter:drop-shadow(0 0 10px rgba(253,230,138,0.6));
+}
+.warn-title{font-size:14px;font-weight:800;color:var(--yellow)}
+.warn p{font-size:13px;color:rgba(253,230,138,0.75);line-height:1.6;font-weight:600}
+
+/* ====== LOADING gif ====== */
+.loader-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 0;gap:18px}
+.loader-gif{
+  width:140px;height:140px;
+  object-fit:contain;
+  filter:drop-shadow(0 0 20px rgba(168,85,247,0.55));
+}
+.loader-fallback{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--purple);border-right-color:var(--pink);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-txt{font-size:14px;font-weight:700;color:var(--muted)}
+
+/* ====== TERMINAL OUTPUT ====== */
+.term{background:#05020f;border:1px solid rgba(168,85,247,0.2);border-radius:var(--radius-sm);padding:14px 16px;font-family:'Space Mono',monospace;font-size:11.5px;color:#c4b5fd;white-space:pre-wrap;max-height:200px;overflow-y:auto;margin-top:12px;line-height:1.7}
+.term::-webkit-scrollbar{width:3px}
+.term::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.term .ok{color:var(--green)}
+.term .err{color:var(--red)}
+
+/* ====== FILE BROWSER ====== */
+.path-bar{display:flex;align-items:center;gap:8px;background:rgba(168,85,247,0.07);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 13px;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--lavender);margin-bottom:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.file-row{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;cursor:pointer;transition:background .14s;user-select:none}
+.file-row:hover{background:var(--glassh)}
+
+/* Custom file/folder icons */
+/* File browser icons — big and highlighted */
+.file-ico{width:56px;height:56px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.file-ico img{object-fit:contain;transition:filter .15s, transform .15s}
+.file-ico.dir img{
+  width:54px;height:40px;
+  filter:drop-shadow(0 0 8px rgba(168,85,247,0.5));
+}
+.file-ico.fil img{
+  width:36px;height:52px;
+  filter:drop-shadow(0 0 8px rgba(196,181,253,0.4));
+}
+.file-row:hover .file-ico img{
+  filter:drop-shadow(0 0 12px rgba(168,85,247,0.8));
+  transform:scale(1.08);
+}
+
+.file-name{flex:1;font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-meta{font-size:10.5px;color:var(--muted2);flex-shrink:0;font-weight:600}
+.file-acts{display:flex;gap:5px;opacity:0;transition:opacity .14s;flex-shrink:0}
+.file-row:hover .file-acts{opacity:1}
+.icon-btn{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:7px;padding:4px 8px;cursor:pointer;font-size:12px;transition:all .14s}
+.icon-btn:hover{background:var(--glassh);border-color:var(--borderh)}
+
+/* Empty state with custom icon */
+.empty{text-align:center;padding:36px 0}
+.empty img{
+  width:110px;height:110px;
+  object-fit:contain;
+  opacity:.75;margin-bottom:14px;
+  filter:drop-shadow(0 0 14px rgba(168,85,247,0.45));
+}
+.empty-txt{color:var(--muted2);font-size:15px;font-weight:700}
+
+/* ====== MODAL ====== */
+.overlay{position:fixed;inset:0;background:rgba(5,2,15,0.7);backdrop-filter:blur(8px);z-index:50;display:none;animation:fadein .18s}
+.overlay.on{display:flex;align-items:center;justify-content:center}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.modal{background:rgba(22,14,40,0.95);border:1px solid var(--borderh);border-radius:var(--radius);padding:22px;width:340px;max-width:90vw;box-shadow:0 24px 60px rgba(0,0,0,0.6),var(--glow);animation:popIn .2s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.modal h3{font-size:15px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* ====== SCROLLBARS ====== */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:rgba(168,85,247,0.25);border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+</style>
+</head>
+<body>
+
+<!-- ========== TOPBAR ========== -->
+<div id="topbar">
+  <div id="topbar-banner"></div>
+  <div id="topbar-content">
+    <div class="logo-area">
+      <!-- App logo — swap img src once done, fallback div shows if missing -->
+      <img class="logo-img" src="assets/logo.png" alt="SysToolPro"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="logo-img-fallback" style="display:none">☠️</div>
+      <div class="logo-text">
+        <h1>SysToolPro</h1>
+        <p>Linux System Manager</p>
+      </div>
+    </div>
+    <!-- Status pill with custom connected icon -->
+    <div class="status-pill">
+      <img src="assets/icons/icon-connected.png" alt="connected"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+      <span class="status-dot-fallback" style="display:none">●</span>
+      Kali Linux
+    </div>
+  </div>
+</div>
+
+<!-- ========== APP ========== -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sec-label">System Info</div>
+
+    <div class="nav-btn active" id="nb-hw" onclick="go('hw')">
+      <div class="ni"><img src="assets/icons/nav-hardware.png" alt="Hardware"></div>
+      Hardware
+    </div>
+    <div class="nav-btn" id="nb-os" onclick="go('os')">
+      <div class="ni"><img src="assets/icons/nav-os.png" alt="OS"></div>
+      OS Info
+    </div>
+    <div class="nav-btn" id="nb-proc" onclick="go('proc')">
+      <div class="ni"><img src="assets/icons/nav-processes.png" alt="Processes"></div>
+      Processes
+    </div>
+
+    <div class="sec-label">Utilities</div>
+
+    <div class="nav-btn" id="nb-files" onclick="go('files')">
+      <div class="ni"><img src="assets/icons/nav-files.png" alt="Files"></div>
+      File Browser
+    </div>
+    <div class="nav-btn" id="nb-search" onclick="go('search')">
+      <div class="ni"><img src="assets/icons/nav-search.png" alt="Search"></div>
+      Search
+    </div>
+    <div class="nav-btn" id="nb-boot" onclick="go('boot')">
+      <div class="ni"><img src="assets/icons/nav-bootable.png" alt="Bootable"></div>
+      Bootable Drive
+    </div>
+    <div class="nav-btn" id="nb-fmt" onclick="go('fmt')">
+      <div class="ni"><img src="assets/icons/nav-format.png" alt="Format"></div>
+      Format Storage
+    </div>
+    <div class="nav-btn" id="nb-opt" onclick="go('opt')">
+      <div class="ni"><img src="assets/icons/nav-optimize.png" alt="Optimize"></div>
+      Disk Optimize
+    </div>
+
+    <div class="sidebar-footer">☠️ Team MASISIKIP</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content-wrap"></div>
+</div>
+
+<!-- MODAL OVERLAY -->
+<div class="overlay" id="ov" onclick="closeModal()">
+  <div class="modal" id="mod" onclick="event.stopPropagation()">
+    <div id="mod-body"></div>
+  </div>
+</div>
+
+<script>
+/* ===== HELPERS ===== */
+const $  = id => document.getElementById(id);
+const esc    = s => String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+const escH   = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+let curPath = '/home';
+
+/* Loading — uses custom gif with CSS fallback */
+function loading(msg='Fetching data...'){
+  return `<div class="loader-wrap">
+    <img class="loader-gif" src="assets/icons/loading.gif" alt="loading"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="loader-fallback" style="display:none"></div>
+    <div class="loader-txt">${msg}</div>
+  </div>`;
+}
+
+/* Empty state — uses custom no-results icon */
+function emptyState(msg='Nothing here'){
+  return `<div class="empty">
+    <img src="assets/icons/icon-noresults.png" alt="empty"
+         onerror="this.style.display='none'">
+    <div class="empty-txt">${msg}</div>
+  </div>`;
+}
+
+/* Warning box — uses custom warning icon */
+function warnBox(title, msg){
+  return `<div class="warn">
+    <div class="warn-head">
+      <img src="assets/icons/icon-warning.png" alt="warning"
+           onerror="this.style.display='none'">
+      <div class="warn-title">⚠️ ${title}</div>
+    </div>
+    <p>${msg}</p>
+  </div>`;
+}
+
+/* Card icon — uses custom img if provided, else emoji fallback */
+function cardIcon(imgSrc, fallbackEmoji){
+  return `<div class="card-icon">
+    <img src="${imgSrc}" alt="" onerror="this.outerHTML='${fallbackEmoji}'">
+  </div>`;
+}
+
+async function api(path, method='GET', body=null){
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(body) opts.body=JSON.stringify(body);
+  try{
+    const r=await fetch('/api/'+path,opts);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json();
+  }catch(e){return{error:e.message}}
+}
+
+/* ===== NAVIGATION ===== */
+function go(page){
+  document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
+  $('nb-'+page).classList.add('active');
+  ({hw:pageHW,os:pageOS,proc:pageProc,files:()=>pageFiles(),
+    search:pageSearch,boot:pageBoot,fmt:pageFmt,opt:pageOpt})[page]();
+}
+
+/* ===== MODAL ===== */
+function openModal(h){ $('mod-body').innerHTML=h; $('ov').classList.add('on') }
+function closeModal(){ $('ov').classList.remove('on') }
+
+/* ===== HARDWARE ===== */
+async function pageHW(){
+  $('content-wrap').innerHTML=`
+    <div class="page-header"><div class="page-title">⚙️ Hardware Info</div>
+    <div class="page-sub">CPU, Memory, Motherboard & Storage</div></div>${loading()}`;
+  const d=await api('hardware');
+  if(d.error){$('content-wrap').innerHTML=`<div class="card"><p style="color:var(--red)">${escH(d.error)}</p></div>`;return}
+  $('content-wrap').innerHTML=`
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:14px">
+        <img src="assets/icons/icon-hardware-header.png" style="width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(168,85,247,0.6))" onerror="this.style.display='none'">
+        <div><div class="page-title">Hardware Info</div><div class="page-sub">CPU, Memory, Motherboard & Storage</div></div>
+      </div>
+    </div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-label">${cardIcon('assets/icons/icon-processor.png','🔲')} Processor</div>
+        </div>
+        <div class="row"><span class="row-key">Model</span><span class="row-val">${escH(d.cpu.model)}</span></div>
+        <div class="row"><span class="row-key">Cores</span><span class="row-val"><span class="pill pill-p">${d.cpu.cores} cores</span></span></div>
+        <div class="row"><span class="row-key">Architecture</span><span class="row-val">${escH(d.cpu.architecture)}</span></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-label">${cardIcon('assets/icons/icon-ram.png','🧠')} Memory (RAM)</div>
+        </div>
+        <div class="row"><span class="row-key">Total</span><span class="row-val">${escH(d.memory.total)}</span></div>
+        <div class="row"><span class="row-key">Available</span><span class="row-val"><span class="pill pill-g">${escH(d.memory.available)}</span></span></div>
+        <div class="row"><span class="row-key">Speed</span><span class="row-val">${escH(d.memory.speed)}</span></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-label">${cardIcon('assets/icons/icon-motherboard.png','🖥️')} Motherboard</div>
+        </div>
+        <div class="row"><span class="row-key">Manufacturer</span><span class="row-val">${escH(d.motherboard.manufacturer)}</span></div>
+        <div class="row"><span class="row-key">Model</span><span class="row-val">${escH(d.motherboard.model)}</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-label">${cardIcon('assets/icons/icon-storage.png','💿')} Storage Devices</div>
+      </div>
+      <div class="tbl-wrap"><table>
+        <tr><th>Device</th><th>Total</th><th>Free</th><th>Filesystem</th></tr>
+        ${(d.storage||[]).map(s=>`<tr>
+          <td><span class="pill pill-pk">${escH(s.device)}</span></td>
+          <td>${escH(s.size)}</td>
+          <td><span class="pill pill-g">${escH(s.free)}</span></td>
+          <td>${escH(s.fstype)}</td>
+        </tr>`).join('')||`<tr><td colspan="4">${emptyState('No storage devices found')}</td></tr>`}
+      </table></div>
+    </div>`;
+}
+
+/* ===== OS INFO ===== */
+async function pageOS(){
+  $('content-wrap').innerHTML=`
+    <div class="page-header"><div class="page-title">OS Information</div>
+    <div class="page-sub">System, Kernel & Network</div></div>${loading()}`;
+  const d=await api('osinfo');
+  if(d.error){$('content-wrap').innerHTML=`<div class="card"><p style="color:var(--red)">${escH(d.error)}</p></div>`;return}
+  $('content-wrap').innerHTML=`
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:14px">
+        <img src="assets/icons/icon-os-header.png" style="width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(168,85,247,0.6))" onerror="this.style.display='none'">
+        <div><div class="page-title">OS Information</div><div class="page-sub">System, Kernel & Network Configuration</div></div>
+      </div>
+    </div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-label">${cardIcon('assets/icons/icon-os.png','💻')} Operating System</div>
+        </div>
+        <div class="row"><span class="row-key">OS Name</span><span class="row-val"><span class="pill pill-p">${escH(d.name)}</span></span></div>
+        <div class="row"><span class="row-key">Version</span><span class="row-val">${escH(d.version||'N/A')}</span></div>
+        <div class="row"><span class="row-key">Kernel</span><span class="row-val" style="font-family:'Space Mono',monospace;font-size:11px">${escH(d.kernel)}</span></div>
+        <div class="row"><span class="row-key">Uptime</span><span class="row-val"><span class="pill pill-g">${escH(d.uptime)}</span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-label">
+          ${cardIcon('assets/icons/icon-network.png','🌐')} Network Interfaces
+        </div>
+      </div>
+      ${d.network.length
+        ?`<div class="tbl-wrap"><table>
+            <tr><th>Interface</th><th>IP Address</th><th>MAC Address</th></tr>
+            ${d.network.map(n=>`<tr>
+              <td><span class="pill pill-pk">${escH(n.interface)}</span></td>
+              <td>${escH(n.ip)}</td>
+              <td style="font-family:'Space Mono',monospace;font-size:10.5px">${escH(n.mac)}</td>
+            </tr>`).join('')}
+          </table></div>`
+        :emptyState('No network interfaces found')}
+    </div>`;
+}
+
+/* ===== PROCESSES ===== */
+async function pageProc(){
+  $('content-wrap').innerHTML=`
+    <div class="page-header"><div class="page-title">Running Processes</div>
+    <div class="page-sub">Top 50 by CPU usage</div></div>${loading()}`;
+  const procs=await api('processes');
+  if(procs.error){$('content-wrap').innerHTML=`<div class="card"><p style="color:var(--red)">${escH(procs.error)}</p></div>`;return}
+  $('content-wrap').innerHTML=`
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:14px">
+        <img src="assets/icons/icon-processes-header.png" style="width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(168,85,247,0.6))" onerror="this.style.display='none'">
+        <div><div class="page-title">Running Processes</div><div class="page-sub">Top 50 sorted by CPU usage</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-label">${cardIcon('assets/icons/icon-activeprocesses.png','🔄')} Active Processes</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="pill pill-p">${procs.length} shown</span>
+          <button class="btn btn-ghost btn-sm" onclick="pageProc()">
+            <img src="assets/icons/icon-refresh.png" style="width:20px;height:20px;object-fit:contain" onerror="this.outerHTML='🔄'">
+            Refresh
+          </button>
+        </div>
+      </div>
+      <div class="tbl-wrap"><table>
+        <tr><th>#</th><th>Name</th><th>PID</th><th>CPU (s)</th><th>Memory (MB)</th></tr>
+        ${procs.map((p,i)=>`<tr>
+          <td style="color:var(--muted2);font-size:11px">${i+1}</td>
+          <td style="font-weight:700">${escH(p.name)}</td>
+          <td><span class="pill pill-pk">${p.pid}</span></td>
+          <td>${p.cpu}</td>
+          <td>${p.memory}</td>
+        </tr>`).join('')}
+      </table></div>
+    </div>`;
+}
+
+/* ===== FILE BROWSER ===== */
+async function pageFiles(path){
+  if(path!==undefined) curPath=path;
+  $('content-wrap').innerHTML=`
+    <div class="page-header"><div class="page-title">File Browser</div>
+    <div class="page-sub">Navigate your filesystem</div></div>${loading()}`;
+  const d=await api('files?path='+encodeURIComponent(curPath));
+  if(d.error){$('content-wrap').innerHTML=`<div class="card"><p style="color:var(--red)">${escH(d.error)}</p></div>`;return}
+  $('content-wrap').innerHTML=`
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:14px">
+        <img src="assets/icons/icon-files-header.png" style="width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(168,85,247,0.6))" onerror="this.style.display='none'">
+        <div><div class="page-title">File Browser</div><div class="page-sub">Navigate, create, rename & delete files</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-label">${cardIcon('assets/icons/icon-directory.png','📂')} Directory</div>
+        <div class="btn-row">
+          ${d.parent?`<button class="btn btn-ghost btn-sm" onclick="pageFiles('${esc(d.parent)}')">⬆️ Up</button>`:''}
+          <button class="btn btn-primary btn-sm" onclick="modalCreate('${esc(d.path)}')">
+            <img src="assets/icons/icon-newfile.png" style="width:22px;height:22px;object-fit:contain;filter:brightness(1.3)" onerror="this.outerHTML='➕'">
+            New
+          </button>
+        </div>
+      </div>
+      <div class="path-bar">📍 ${escH(d.path)}</div>
+      <div id="file-list">
+      ${!d.items||d.items.length===0
+        ? emptyState('This directory is empty')
+        : d.items.map(it=>`
+          <div class="file-row" onclick="${it.type==='directory'?`pageFiles('${esc(d.path)}/${esc(it.name)}')`:''}"
+               style="${it.type!=='directory'?'cursor:default':''}">
+            <div class="file-ico ${it.type==='directory'?'dir':'fil'}">
+              <img src="assets/${it.type==='directory'?'folder':'file'}.png" alt="${it.type}"
+                   onerror="this.outerHTML='${it.type==='directory'?'📁':'📄'}'">
+            </div>
+            <div class="file-name">${escH(it.name)}</div>
+            <div class="file-meta" style="width:90px;text-align:right">${escH(it.size)}</div>
+            <div class="file-meta" style="width:130px;text-align:right">${escH(it.modified)}</div>
+            <div class="file-acts" onclick="event.stopPropagation()">
+              <div class="icon-btn" onclick="modalRename('${esc(d.path+'/'+it.name)}','${esc(it.name)}')">✏️</div>
+              <div class="icon-btn" style="color:var(--red)" onclick="doDelete('${esc(d.path+'/'+it.name)}')">🗑️</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function modalCreate(dir){
+  openModal(`<h3>➕ Create New Item</h3>
+    <div class="fg"><label>Name</label><input id="cn" placeholder="filename.txt" autofocus></div>
+    <div class="fg"><label>Type</label><select id="ct"><option value="file">📄 File</option><option value="directory">📁 Folder</option></select></div>
+    <div class="btn-row" style="margin-top:6px">
+      <button class="btn btn-primary" onclick="doCreate('${esc(dir)}')">Create</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    </div>`);
+}
+function modalRename(path,name){
+  openModal(`<h3>✏️ Rename</h3>
+    <div class="fg"><label>New Name</label><input id="rn" value="${escH(name)}" autofocus></div>
+    <div class="btn-row" style="margin-top:6px">
+      <button class="btn btn-primary" onclick="doRename('${esc(path)}')">Rename</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    </div>`);
+}
+async function doCreate(dir){
+  const n=$('cn').value.trim(),t=$('ct').value;
+  if(!n) return;
+  const r=await api('files/create','POST',{path:dir+'/'+n,type:t});
+  if(!r.success) alert('Error: '+r.message);
+  closeModal(); pageFiles(dir);
+}
+async function doRename(path){
+  const n=$('rn').value.trim();
+  if(!n) return;
+  const r=await api('files/rename','POST',{path,newName:n});
+  if(!r.success) alert('Error: '+r.message);
+  closeModal(); pageFiles();
+}
+async function doDelete(path){
+  if(!confirm('Delete "'+path+'"?\nThis cannot be undone.')) return;
+  await api('files/delete','POST',{path});
+  pageFiles();
+}
+
+/* ===== SEARCH ===== */
+function pageSearch(){
+  $('content-wrap').innerHTML=`
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:14px">
+        <img src="assets/icons/icon-search-header.png" style="width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(168,85,247,0.6))" onerror="this.style.display='none'">
+        <div><div class="page-title">File Search</div><div class="page-sub">Search by filename or content</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-label">${cardIcon('assets/icons/icon-searchfiles.png','🔎')} Search Files</div>
+      </div>
+      <div class="fg"><label>Search Path</label><input id="sp" value="/home" placeholder="/home"></div>
+      <div class="fg"><label>Query</label><input id="sq" placeholder="Enter filename or keyword..." onkeydown="if(event.key==='Enter')doSearch()"></div>
+      <div class="fg">
+        <label>Sort By</label>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <div id="mode-name" onclick="setMode('name')" style="flex:1;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--radius-sm);border:2px solid var(--purple);background:rgba(168,85,247,0.12);cursor:pointer;transition:all .18s">
+            <img src="assets/icons/icon-filename.png" style="width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 0 6px rgba(168,85,247,0.6))" onerror="this.outerHTML='🔠'">
+            <div>
+              <div style="font-size:13px;font-weight:800;color:var(--lavender)">Filename</div>
+              <div style="font-size:11px;color:var(--muted);font-weight:600">Search by file name</div>
+            </div>
+          </div>
+          <div id="mode-content" onclick="setMode('content')" style="flex:1;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--glass);cursor:pointer;transition:all .18s">
+            <img src="assets/icons/icon-content.png" style="width:44px;height:44px;object-fit:contain;filter:brightness(0.7)" onerror="this.outerHTML='📝'">
+            <div>
+              <div style="font-size:13px;font-weight:800;color:var(--muted)">Content</div>
+              <div style="font-size:11px;color:var(--muted2);font-weight:600">Search inside files</div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="sm" value="name">
+      </div>
+      <button class="btn btn-primary" onclick="doSearch()">🔍 Search</button>
+      <div id="sr" style="margin-top:14px"></div>
+    </div>`;
+}
+function setMode(m){
+  $('sm').value=m;
+  const activeStyle='border:2px solid var(--purple);background:rgba(168,85,247,0.12)';
+  const inactiveStyle='border:2px solid var(--border);background:var(--glass)';
+  $('mode-name').style.cssText    = 'flex:1;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--radius-sm);cursor:pointer;transition:all .18s;'+(m==='name'?activeStyle:inactiveStyle);
+  $('mode-content').style.cssText = 'flex:1;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--radius-sm);cursor:pointer;transition:all .18s;'+(m==='content'?activeStyle:inactiveStyle);
+  // update icon brightness
+  const ni=$('mode-name').querySelector('img'), ci=$('mode-content').querySelector('img');
+  if(ni) ni.style.filter=m==='name'?'drop-shadow(0 0 6px rgba(168,85,247,0.6))':'brightness(0.7)';
+  if(ci) ci.style.filter=m==='content'?'drop-shadow(0 0 6px rgba(168,85,247,0.6))':'brightness(0.7)';
+  const nl=$('mode-name').querySelector('div>div'), cl=$('mode-content').querySelector('div>div');
+  if(nl) nl.style.color=m==='name'?'var(--lavender)':'var(--muted)';
+  if(cl) cl.style.color=m==='content'?'var(--lavender)':'var(--muted)';
+}
+async function doSearch(){
+  const sp=$('sp').value,sq=$('sq').value.trim(),sm=$('sm').value;
+  if(!sq){alert('Enter a search query.');return}
+  $('sr').innerHTML=loading('Searching...');
+  const d=await api('search','POST',{searchPath:sp,query:sq,searchContent:sm==='content'});
+  if(!d.results||d.count===0){$('sr').innerHTML=emptyState('No results found');return}
+  $('sr').innerHTML=`<p style="font-size:11px;color:var(--muted);margin-bottom:10px;font-weight:700">${d.count} result(s)</p>`+
+    d.results.map(r=>`<div class="file-row" style="cursor:default">
+      <div class="file-ico fil"><img src="assets/${r.matchType.includes('Content')?'icons/icon-searchfiles':'file'}.png" alt=""
+           onerror="this.outerHTML='🔎'"></div>
+      <div class="file-name" style="font-family:'Space Mono',monospace;font-size:11px">${escH(r.path)}</div>
+      <span class="pill pill-p" style="font-size:10px;flex-shrink:0">${escH(r.matchType)}</span>
+    </div>`).join('');
+}
+
+/* ===== BOOTABLE DRIVE ===== */
+function pageBoot(){
+  $('content-wrap').innerHTML=`
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:14px">
+        <img src="assets/icons/icon-boot-header.png" style="width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(168,85,247,0.6))" onerror="this.style.display='none'">
+        <div><div class="page-title">Bootable Drive</div><div class="page-sub">Write ISO image to USB device</div></div>
+      </div>
+    </div>
+    ${warnBox('Data Loss Warning!','Writing an ISO will PERMANENTLY ERASE ALL DATA on the selected device. Verify the device path before proceeding. This action is irreversible.')}
+    <div class="card">
+      <div class="card-head">
+        <div class="card-label">${cardIcon('assets/icons/icon-createbootable.png','💾')} Create Bootable USB</div>
+      </div>
+      <div class="fg"><label>ISO File Path</label><input id="bi" placeholder="/path/to/kali-linux.iso"></div>
+      <div class="fg"><label>Target Device (e.g. /dev/sdb)</label><input id="bd" placeholder="/dev/sdb"></div>
+      <label class="check-row"><input type="checkbox" id="bc">
+        I understand all data on the target device will be permanently erased.
+      </label>
+      <button class="btn btn-danger" onclick="doBoot()">🚀 Write ISO to Drive</button>
+      <div id="bo"></div>
+    </div>`;
+}
+async function doBoot(){
+  if(!$('bc').checked){alert('Please check the confirmation box first.');return}
+  const iso=$('bi').value.trim(),dev=$('bd').value.trim();
+  if(!iso||!dev){alert('Please fill in all fields.');return}
+  $('bo').innerHTML='<div class="term">⏳ Writing ISO to device... This may take several minutes.\nDo NOT close this window.</div>';
+  const d=await api('bootable','POST',{isoPath:iso,device:dev});
+  $('bo').innerHTML=`<div class="term"><span class="${d.success?'ok':'err'}">${d.success?'✅':'❌'} ${escH(d.message)}</span>\n${escH(d.output||'')}</div>`;
+}
+
+/* ===== FORMAT STORAGE ===== */
+function pageFmt(){
+  $('content-wrap').innerHTML=`
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:14px">
+        <img src="assets/icons/icon-format-header.png" style="width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(168,85,247,0.6))" onerror="this.style.display='none'">
+        <div><div class="page-title">Format Storage</div><div class="page-sub">Format a partition or storage device</div></div>
+      </div>
+    </div>
+    ${warnBox('Data Loss Warning!','Formatting will PERMANENTLY DESTROY ALL DATA on the selected device or partition. Make sure you have a backup before proceeding.')}
+    <div class="card">
+      <div class="card-head">
+        <div class="card-label">${cardIcon('assets/icons/icon-formatdevice.png','🗂️')} Format Device</div>
+      </div>
+      <div class="fg"><label>Device / Partition Path</label><input id="fd" placeholder="/dev/sdb1"></div>
+      <div class="fg"><label>File System</label>
+        <select id="ff">
+          <option>ext4</option><option>ext3</option><option>ext2</option>
+          <option>ntfs</option><option>vfat</option><option>exfat</option><option>btrfs</option>
+        </select>
+      </div>
+      <div class="fg"><label>Volume Label (optional)</label><input id="fl" placeholder="MY_DRIVE"></div>
+      <label class="check-row"><input type="checkbox" id="fc">
+        I confirm I want to permanently erase all data on this device.
+      </label>
+      <button class="btn btn-danger" onclick="doFmt()">🗑️ Format Device</button>
+      <div id="fo"></div>
+    </div>`;
+}
+async function doFmt(){
+  if(!$('fc').checked){alert('Please check the confirmation box first.');return}
+  const dev=$('fd').value.trim(),fs=$('ff').value,lbl=$('fl').value.trim();
+  if(!dev){alert('Enter a device path.');return}
+  $('fo').innerHTML='<div class="term">⏳ Formatting device...</div>';
+  const d=await api('format','POST',{device:dev,fileSystem:fs,label:lbl});
+  $('fo').innerHTML=`<div class="term"><span class="${d.success?'ok':'err'}">${d.success?'✅':'❌'} ${escH(d.message)}</span>\n${escH(d.output||'')}</div>`;
+}
+
+/* ===== DISK OPTIMIZE ===== */
+function pageOpt(){
+  $('content-wrap').innerHTML=`
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:14px">
+        <img src="assets/icons/icon-optimize-header.png" style="width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(168,85,247,0.6))" onerror="this.style.display='none'">
+        <div><div class="page-title">Disk Optimization</div><div class="page-sub">Linux disk health & cleanup tasks</div></div>
+      </div>
+    </div>
+    <div class="grid2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-label">${cardIcon('assets/icons/icon-nodefrag.png','ℹ️')} Why Not Defrag?</div>
+        </div>
+        <p style="font-size:13.5px;color:var(--muted);line-height:1.7;font-weight:600">
+          Traditional defragmentation is <strong style="color:var(--text)">not needed on Linux filesystems</strong> like ext4 or btrfs.
+          They use delayed allocation to avoid fragmentation automatically. This tool runs equivalent Linux optimization tasks instead.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-label">${cardIcon('assets/icons/icon-whatthisdoes.png','🔧')} What This Does</div>
+        </div>
+        <div class="row"><span class="row-key">fstrim</span><span class="row-val" style="font-size:12px;color:var(--muted)">SSD TRIM — reclaims unused blocks</span></div>
+        <div class="row"><span class="row-key">APT Cache</span><span class="row-val" style="font-size:12px;color:var(--muted)">Clears cached .deb packages</span></div>
+        <div class="row"><span class="row-key">Journal Vacuum</span><span class="row-val" style="font-size:12px;color:var(--muted)">Removes logs older than 7 days</span></div>
+        <div class="row"><span class="row-key">/tmp Info</span><span class="row-val" style="font-size:12px;color:var(--muted)">Reports temp folder size</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-label">${cardIcon('assets/icons/icon-runoptimize.png','⚡')} Run Optimization</div>
+      </div>
+      <div class="fg"><label>Mount Point</label><input id="om" value="/" placeholder="/"></div>
+      <button class="btn btn-success" onclick="doOpt()">⚡ Run Now</button>
+      <div id="oo"></div>
+    </div>`;
+}
+async function doOpt(){
+  $('oo').innerHTML='<div class="term">⏳ Running optimization tasks...</div>';
+  const d=await api('optimize','POST',{mountPoint:$('om').value||'/'});
+  $('oo').innerHTML=`<div class="term"><span class="${d.success?'ok':'err'}">${d.success?'✅ Complete!':'❌ Error'}</span>\n\n${escH(d.output||'')}</div>`;
+}
+
+/* ===== INIT ===== */
+go('hw');
+</script>
+</body>
+</html>
