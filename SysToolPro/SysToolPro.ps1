@@ -1,9 +1,3 @@
-#!/usr/bin/env pwsh
-# ================================================================
-#  SysToolPro - Kuromi Edition
-#  PT2 Final Case Study | Platform Technologies 2
-#  Run: sudo pwsh SysToolPro.ps1
-# ================================================================
 param([int]$Port = 8080)
 Add-Type -AssemblyName System.Web
 
