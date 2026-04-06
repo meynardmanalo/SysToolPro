@@ -34,8 +34,6 @@
 html{ font-size: 17px; }
 html,body{height:100%;overflow:hidden;background:var(--bg)}
 body{font-family:'Nunito',sans-serif;color:var(--text);display:flex;flex-direction:column}
-
-/* BG MESH */
 body::before{
   content:'';position:fixed;inset:0;z-index:0;
   background:
@@ -46,7 +44,6 @@ body::before{
   pointer-events:none;
 }
 
-/* ====== TOPBAR with Banner ====== */
 #topbar{
   position:relative;z-index:10;
   flex-shrink:0;
@@ -54,13 +51,11 @@ body::before{
   overflow:hidden;
   border-bottom:2px solid var(--border);
 }
-/* Banner — fully stretched 2500x500 → fills div */
 #topbar-banner{
   position:absolute;inset:0;
   background:url('assets/banner.png') center center / 100% 100% no-repeat;
   filter:brightness(0.6) saturate(1.3);
 }
-/* Dark overlay for readability */
 #topbar-banner::after{
   content:'';position:absolute;inset:0;
   background:linear-gradient(90deg,rgba(11,7,21,0.78) 0%,rgba(11,7,21,0.35) 50%,rgba(11,7,21,0.6) 100%);
@@ -73,7 +68,6 @@ body::before{
 }
 .logo-area{display:flex;align-items:center;gap:14px}
 
-/* Logo — big, no border-radius clipping the design, no extra padding */
 .logo-img{
   width:76px;height:76px;
   border-radius:0;
@@ -99,7 +93,6 @@ body::before{
   font-size:14px;font-weight:800;color:var(--green);
   box-shadow:0 0 16px rgba(134,239,172,0.08);
 }
-/* Status icon — no padding, full size, glowing */
 .status-pill img{
   width:32px;height:32px;
   object-fit:contain;
@@ -109,10 +102,8 @@ body::before{
 .status-dot-fallback{animation:blink 2s infinite;font-size:14px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ====== MAIN LAYOUT ====== */
 #app{position:relative;z-index:1;flex:1;display:flex;overflow:hidden;min-height:0}
 
-/* ====== SIDEBAR ====== */
 #sidebar{
   width:255px;flex-shrink:0;
   background:rgba(17,13,31,0.6);
